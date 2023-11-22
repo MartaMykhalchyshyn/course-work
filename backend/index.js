@@ -6,23 +6,10 @@ const cors = require("cors");
 
 const port = 3000;
 
-// Підключення до бази даних MongoDB Atlas
-mongoose.connect(
-  "mongodb+srv://martamykhalchyshyn:kvQijY8ALyAeNn62@cluster0.xn4vskz.mongodb.net/heating-advisor?retryWrites=true&w=majority",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
+const connectDB = require("./connectMongo");
 
-// Перевірка підключення
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "Помилка підключення до MongoDB:"));
-db.once("open", () => {
-  console.log("Підключено до MongoDB");
-});
+connectDB();
 
-// Модель користувача
 const userSchema = new mongoose.Schema({
   username: { type: String, unique: true, required: true },
   password: { type: String, required: true },
@@ -164,13 +151,11 @@ app.post("/addCity", (req, res) => {
       const maxId = Math.max(...user.favoriteCities.map((city) => city.id));
       const newCityId = maxId + 1;
 
-      // Створюємо новий об'єкт міста з вказаним id
       const city = {
         id: newCityId,
         cityName: cityName,
       };
 
-      // Додаємо нове місто до масиву улюблених міст користувача
       user.favoriteCities.push(city);
 
       user
